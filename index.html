@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Le Capannine - Beach Volley Club Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 30px; }
+    header { background: linear-gradient(135deg, #0284c7, #075985); color: white; padding: 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto; }
+    .logo-title { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { background: #f59e0b; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .actions { display: flex; gap: 8px; }
+    .btn-icon { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .btn-icon:hover { background: rgba(255,255,255,0.3); }
+    .container { max-width: 800px; margin: 0 auto; padding: 16px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--card-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stat-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; }
+    .stat-value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+    .text-danger { color: var(--danger); }
+    .text-success { color: var(--success); }
+    .search-bar { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); font-size: 15px; margin-bottom: 16px; outline: none; background: white; }
+    .search-bar:focus { border-color: var(--primary); }
+    .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; }
+    .filter-btn { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: white; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+    .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .soci-list { display: flex; flex-direction: column; gap: 10px; }
+    .socio-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .socio-info { display: flex; flex-direction: column; gap: 4px; }
+    .socio-name { font-weight: 600; font-size: 16px; }
+    .socio-details { font-size: 13px; color: var(--text-secondary); }
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; margin-top: 4px; }
+    .badge-ok { background: #d1fae5; color: #065f46; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 16px; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+    .form-control { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; }
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; font-size: 15px; cursor: pointer; margin-top: 8px; }
+    .btn-secondary { background: #e2e8f0; color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <div class="logo-title">
+        <div class="logo-icon">🏐</div>
+        <div>
+          <h2>Le Capannine</h2>
+          <span style="font-size: 11px; opacity: 0.8;">Beach Volley Club Manager</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-icon" onclick="openConfigModal()" title="Configura Cloud Supabase">⬆️</button>
+        <button class="btn-icon" onclick="openSocioModal()" style="background: #f59e0b;">➕</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Totale Soci</div>
+        <div class="stat-value" id="stat-totale">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Certificati Critici</div>
+        <div class="stat-value text-danger" id="stat-certificati">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Totale Incassato</div>
+        <div class="stat-value text-success" id="stat-incassato">€ 0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Da Incassare</div>
+        <div class="stat-value text-danger" id="stat-da-incassare">€ 0.00</div>
+      </div>
+    </div>
+
+    <input type="text" id="search" class="search-bar" placeholder="Cerca per Nome, Cognome o Tel..." oninput="renderSoci()">
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('tutti', this)">Tutti</button>
+      <button class="filter-btn" onclick="setFilter('scaduti', this)">Certificato Scaduto</button>
+      <button class="filter-btn" onclick="setFilter('da-pagare', this)">In Sospeso / Da Pagare</button>
+    </div>
+
+    <div class="soci-list" id="soci-list"></div>
+  </div>
+
+  <!-- Modal Configurazione Supabase -->
+  <div class="modal" id="config-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Configurazione Cloud (Supabase)</h3>
+        <button class="btn-icon btn-secondary" onclick="closeConfigModal()">✕</button>
+      </div>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Inserisci le credenziali del tuo progetto Supabase per sincronizzare i dati in tempo reale.</p>
+      <div class="form-group">
+        <label>Project URL</label>
+        <input type="text" id="cfg-url" class="form-control" placeholder="https://xyz.supabase.co">
+      </div>
+      <div class="form-group">
+        <label>Anon Key / Public Key</label>
+        <input type="text" id="cfg-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiI...">
+      </div>
+      <button class="btn" onclick="saveConfig()">Salva e Connetti</button>
+    </div>
+  </div>
+
+  <!-- Modal Nuovo Socio -->
+  <div class="modal" id="socio-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Nuovo Socio</h3>
+        <button class="btn-icon btn-secondary" onclick="closeSocioModal()">✕</button>
+      </div>
+      <form id="socio-form" onsubmit="saveSocio(event)">
+        <div class="form-group">
+          <label>Nome e Cognome *</label>
+          <input type="text" id="socio-nome" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Telefono</label>
+          <input type="tel" id="socio-tel" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Quota (€)</label>
+          <input type="number" step="0.01" id="socio-quota" class="form-control" placeholder="50.00" required>
+        </div>
+        <div class="form-group">
+          <label>Scadenza Certificato Medico</label>
+          <input type="date" id="socio-cert" class="form-control">
+        </div>
+        <div class="form-group">
+          <label>Stato Pagamento</label>
+          <select id="socio-pagamento" class="form-control">
+            <option value="Regolare">Regolare (Pagato)</option>
+            <option value="Da Pagare">In Sospeso / Da Pagare</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Salva Socio</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
+    let currentFilter = 'tutti';
+
+    function renderSoci() {
+      const listEl = document.getElementById('soci-list');
+      const search = document.getElementById('search').value.toLowerCase();
+      listEl.innerHTML = '';
+
+      let filtered = soci.filter(s => s.nome.toLowerCase().includes(search) || (s.tel && s.tel.includes(search)));
+
+      if(currentFilter === 'scaduti') {
+        const today = new Date().toISOString().split('T')[0];
+        filtered = filtered.filter(s => s.scadenzaCertificati && s.scadenzaCertificati < today);
+      } else if(currentFilter === 'da-pagare') {
+        filtered = filtered.filter(s => s.pagamento === 'Da Pagare');
+      }
+
+      // Conteggi globali
+      document.getElementById('stat-totale').innerText = soci.length;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const critici = soci.filter(s => !s.scadenzaCertificati || s.scadenzaCertificati < today).length;
+      document.getElementById('stat-certificati').innerText = critici;
+
+      const totaleIncassato = soci.filter(s => s.pagamento === 'Regolare').reduce((sum, s) => sum + (parseFloat(s.quota) || 0), 0);
+      const totaleDaIncassare = soci.filter(s => s.pagamento === 'Da Pagare').reduce((sum, s) => sum + (parseFloat(s.quota) || 0), 0);
+
+      document.getElementById('stat-incassato').innerText = '€ ' + totaleIncassato.toFixed(2);
+      document.getElementById('stat-da-incassare').innerText = '€ ' + totaleDaIncassare.toFixed(2);
+
+      if(filtered.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-secondary);">Nessun socio trovato</div>';
+        return;
+      }
+
+      filtered.forEach(s => {
+        const isExpired = !s.scadenzaCertificati || s.scadenzaCertificati < today;
+        const card = document.createElement('div');
+        card.className = 'socio-card';
+        card.innerHTML = `
+          <div class="socio-info">
+            <div class="socio-name">${s.nome}</div>
+            <div class="socio-details">📞 ${s.tel || 'N/D'} | Quota: € ${parseFloat(s.quota || 0).toFixed(2)}</div>
+            <div class="socio-details">📋 Medico: ${s.scadenzaCertificati || 'Mancante'}</div>
+          </div>
+          <div style="text-align: right;">
+            <div><span class="badge ${s.pagamento === 'Regolare' ? 'badge-ok' : 'badge-danger'}">${s.pagamento}</span></div>
+            <div><span class="badge ${isExpired ? 'badge-danger' : 'badge-ok'}">${isExpired ? 'Cert. Scaduto' : 'Cert. OK'}</span></div>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSoci();
+    }
+
+    function openConfigModal() { document.getElementById('config-modal').classList.add('active'); }
+    function closeConfigModal() { document.getElementById('config-modal').classList.remove('active'); }
+    function openSocioModal() { document.getElementById('socio-modal').classList.add('active'); }
+    function closeSocioModal() { document.getElementById('socio-modal').classList.remove('active'); }
+
+    function saveConfig() {
+      const url = document.getElementById('cfg-url').value;
+      const key = document.getElementById('cfg-key').value;
+      localStorage.setItem('supabase_url', url);
+      localStorage.setItem('supabase_key', key);
+      alert('Configurazione salvata!');
+      closeConfigModal();
+    }
+
+    function saveSocio(e) {
+      e.preventDefault();
+      const nuovoSocio = {
+        id: Date.now(),
+        nome: document.getElementById('socio-nome').value,
+        tel: document.getElementById('socio-tel').value,
+        quota: document.getElementById('socio-quota').value,
+        scadenzaCertificati: document.getElementById('socio-cert').value,
+        pagamento: document.getElementById('socio-pagamento').value
+      };
+      soci.push(nuovoSocio);
+      localStorage.setItem('le_capannine_soci', JSON.stringify(soci));
+      renderSoci();
+      closeSocioModal();
+      document.getElementById('socio-form').reset();
+    }
+
+    document.getElementById('cfg-url').value = localStorage.getItem('supabase_url') || 'https://mmyeypkzwxbjytkzdajc.supabase.co';
+    document.getElementById('cfg-key').value = localStorage.getItem('supabase_key') || '';
+    renderSoci();
+  </script>
+</body>
+</html>
