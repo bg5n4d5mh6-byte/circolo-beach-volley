@@ -1,334 +1,834 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Le Capannine - Beach Volley Club Manager</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --primary: #0284c7;
-      --primary-dark: #0369a1;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-secondary: #64748b;
-      --border: #e2e8f0;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --success: #10b981;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 30px; }
-    header { background: linear-gradient(135deg, #0284c7, #075985); color: white; padding: 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto; }
-    .logo-title { display: flex; align-items: center; gap: 10px; }
-    .logo-icon { background: #f59e0b; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
-    .actions { display: flex; gap: 8px; }
-    .btn-icon { background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .btn-icon:hover { background: rgba(255,255,255,0.3); }
-    .container { max-width: 800px; margin: 0 auto; padding: 16px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-    .stat-card { background: var(--card-bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .stat-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; }
-    .stat-value { font-size: 22px; font-weight: 700; margin-top: 4px; }
-    .text-danger { color: var(--danger); }
-    .text-success { color: var(--success); }
-    .search-bar { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border); font-size: 15px; margin-bottom: 16px; outline: none; background: white; }
-    .search-bar:focus { border-color: var(--primary); }
-    .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; }
-    .filter-btn { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); background: white; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-    .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .soci-list { display: flex; flex-direction: column; gap: 10px; }
-    .socio-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    .socio-info { display: flex; flex-direction: column; gap: 4px; }
-    .socio-name { font-weight: 600; font-size: 16px; }
-    .socio-details { font-size: 13px; color: var(--text-secondary); }
-    .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; margin-top: 4px; }
-    .badge-ok { background: #d1fae5; color: #065f46; }
-    .badge-danger { background: #fee2e2; color: #991b1b; }
-    .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 16px; }
-    .modal.active { display: flex; }
-    .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
-    .form-control { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; }
-    .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; font-size: 15px; cursor: pointer; margin-top: 8px; }
-    .btn-secondary { background: #e2e8f0; color: var(--text); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Capannine - Beach Volley Club Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --primary:#0284c7;
+  --dark:#0369a1;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --danger:#ef4444;
+  --success:#10b981;
+}
+* {box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.5;
+}
+header {
+  background:var(--primary);
+  color:white;
+  padding:20px;
+}
+.header-inner {
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+header h1 {font-size:22px}
+header p {font-size:13px;opacity:.9}
+main {max-width:1100px;margin:25px auto;padding:0 15px}
+.card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+h2 {font-size:19px;margin-bottom:15px}
+h3 {font-size:16px;margin:18px 0 10px}
+input,select,textarea {
+  width:100%;
+  padding:11px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  font-size:14px;
+  background:white;
+}
+textarea {min-height:75px;resize:vertical}
+label {
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:5px;
+}
+.field {margin-bottom:13px}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+button {
+  border:0;
+  border-radius:7px;
+  padding:11px 16px;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.primary {background:var(--primary);color:white}
+.secondary {background:#e2e8f0;color:#334155}
+.danger {background:#fee2e2;color:#b91c1c}
+.success {background:#d1fae5;color:#065f46}
+button:disabled {opacity:.5;cursor:not-allowed}
+.actions {display:flex;gap:8px;flex-wrap:wrap}
+.toolbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+.toolbar input {max-width:300px}
+.member {
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:15px;
+  margin-bottom:10px;
+  background:white;
+}
+.member-top {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.member strong {font-size:16px}
+.member-info {font-size:13px;color:var(--muted);margin-top:5px}
+.tag {
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:bold;
+  background:#e0f2fe;
+  color:#075985;
+  margin:3px 3px 0 0;
+}
+.tag-red {background:#fee2e2;color:#991b1b}
+.tag-green {background:#d1fae5;color:#065f46}
+.hidden {display:none!important}
+#toast {
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#1e293b;
+  color:white;
+  padding:12px 18px;
+  border-radius:8px;
+  max-width:90%;
+  z-index:1000;
+  font-size:13px;
+}
+#toast.error {background:#b91c1c}
+#toast.success {background:#047857}
+.modal-bg {
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.6);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:15px;
+  z-index:100;
+}
+.modal {
+  background:white;
+  border-radius:12px;
+  padding:20px;
+  width:100%;
+  max-width:700px;
+  max-height:90vh;
+  overflow:auto;
+}
+.modal-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+.check-row {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:12px 0;
+}
+.check-row input {width:auto}
+.empty {
+  text-align:center;
+  padding:30px;
+  color:var(--muted);
+}
+.small {font-size:12px;color:var(--muted)}
+@media(max-width:600px) {
+  .grid {grid-template-columns:1fr}
+  main {margin:15px auto}
+  .card {padding:15px}
+}
+</style>
 </head>
+
 <body>
 
-  <header>
-    <div class="header-content">
-      <div class="logo-title">
-        <div class="logo-icon">🏐</div>
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>Le Capannine</h1>
+      <p>Beach Volley Club Manager</p>
+    </div>
+    <button id="logoutBtn" class="secondary hidden" onclick="logout()">Esci</button>
+  </div>
+</header>
+
+<main>
+
+  <section id="loginSection" class="card">
+    <h2>Accesso gestionale</h2>
+    <p class="small">Accedi con le credenziali autorizzate.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input id="loginEmail" type="email" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPassword" type="password" required autocomplete="current-password">
+      </div>
+      <button class="primary" type="submit" id="loginBtn">Accedi</button>
+    </form>
+  </section>
+
+  <section id="appSection" class="hidden">
+
+    <div class="card">
+      <div class="toolbar">
         <div>
-          <h2>Le Capannine</h2>
-          <span style="font-size: 11px; opacity: 0.8;">Beach Volley Club Manager</span>
+          <h2>Gestione tesserati</h2>
+          <p class="small" id="connectionStatus">Connessione in corso...</p>
         </div>
+        <button class="primary" onclick="openMember()">+ Nuovo tesserato</button>
       </div>
-      <div class="actions">
-        <button class="btn-icon" onclick="openConfigModal()" title="Configura Cloud Supabase">⬆️</button>
-        <button class="btn-icon" onclick="openSocioModal()" style="background: #f59e0b;">➕</button>
-      </div>
-    </div>
-  </header>
 
-  <div class="container">
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-title">Totale Soci</div>
-        <div class="stat-value" id="stat-totale">0</div>
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="Cerca nome, cognome, email..." oninput="renderMembers()">
+        <button class="secondary" onclick="loadMembers()">Aggiorna elenco</button>
       </div>
-      <div class="stat-card">
-        <div class="stat-title">Certificati Critici</div>
-        <div class="stat-value text-danger" id="stat-certificati">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">Totale Incassato</div>
-        <div class="stat-value text-success" id="stat-incassato">€ 0.00</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">Da Incassare</div>
-        <div class="stat-value text-danger" id="stat-da-incassare">€ 0.00</div>
-      </div>
+
+      <div id="memberCount" class="small"></div>
+      <div id="memberList"></div>
     </div>
 
-    <input type="text" id="search" class="search-bar" placeholder="Cerca per Nome, Cognome o Tel..." oninput="renderSoci()">
+  </section>
 
-    <div class="filters">
-      <button class="filter-btn active" onclick="setFilter('tutti', this)">Tutti</button>
-      <button class="filter-btn" onclick="setFilter('scaduti', this)">Certificato Scaduto</button>
-      <button class="filter-btn" onclick="setFilter('da-pagare', this)">In Sospeso / Da Pagare</button>
+</main>
+
+<div id="memberModal" class="modal-bg hidden">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">Nuovo tesserato</h2>
+      <button class="secondary" type="button" onclick="closeMember()">Chiudi</button>
     </div>
 
-    <div class="soci-list" id="soci-list"></div>
-  </div>
+    <form id="memberForm">
 
-  <!-- Modal Configurazione Supabase -->
-  <div class="modal" id="config-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Configurazione Cloud (Supabase)</h3>
-        <button class="btn-icon btn-secondary" onclick="closeConfigModal()">✕</button>
-      </div>
-      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Credenziali Supabase collegate per la sincronizzazione multi-dispositivo.</p>
-      <div class="form-group">
-        <label>Project URL</label>
-        <input type="text" id="cfg-url" class="form-control">
-      </div>
-      <div class="form-group">
-        <label>Publishable Key</label>
-        <input type="text" id="cfg-key" class="form-control">
-      </div>
-      <button class="btn" onclick="saveConfig()">Salva e Connetti</button>
-    </div>
-  </div>
+      <h3>Dati anagrafici</h3>
 
-  <!-- Modal Nuovo Socio -->
-  <div class="modal" id="socio-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Nuovo Socio</h3>
-        <button class="btn-icon btn-secondary" onclick="closeSocioModal()">✕</button>
-      </div>
-      <form id="socio-form" onsubmit="saveSocio(event)">
-        <div class="form-group">
-          <label>Nome e Cognome *</label>
-          <input type="text" id="socio-nome" class="form-control" required>
+      <div class="grid">
+        <div class="field">
+          <label>Nome *</label>
+          <input id="f-nome" required>
         </div>
-        <div class="form-group">
+        <div class="field">
+          <label>Cognome *</label>
+          <input id="f-cognome" required>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input id="f-email" type="email">
+        </div>
+        <div class="field">
           <label>Telefono</label>
-          <input type="tel" id="socio-tel" class="form-control">
+          <input id="f-telefono" type="tel">
         </div>
-        <div class="form-group">
-          <label>Quota (€)</label>
-          <input type="number" step="0.01" id="socio-quota" class="form-control" placeholder="50.00" required>
+        <div class="field">
+          <label>Data di nascita</label>
+          <input id="f-nascita" type="date">
         </div>
-        <div class="form-group">
-          <label>Scadenza Certificato Medico</label>
-          <input type="date" id="socio-cert" class="form-control">
-        </div>
-        <div class="form-group">
-          <label>Stato Pagamento</label>
-          <select id="socio-pagamento" class="form-control">
-            <option value="Regolare">Regolare (Pagato)</option>
-            <option value="Da Pagare">In Sospeso / Da Pagare</option>
+      </div>
+
+      <div class="check-row">
+        <input id="f-tesserato" type="checkbox" checked>
+        <label for="f-tesserato">Tesserato attivo</label>
+      </div>
+
+      <h3>Certificato medico</h3>
+
+      <div class="grid">
+        <div class="field">
+          <label>Tipo certificato</label>
+          <select id="f-tipo-certificato">
+            <option value="">Seleziona</option>
+            <option value="Agonistico">Agonistico</option>
+            <option value="Non agonistico">Non agonistico</option>
+            <option value="Altro">Altro</option>
           </select>
         </div>
-        <button type="submit" class="btn" id="btn-save-socio">Salva Socio</button>
-      </form>
-    </div>
+        <div class="field">
+          <label>Scadenza certificato</label>
+          <input id="f-scadenza" type="date">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Link file certificato</label>
+        <input id="f-file-certificato" type="url" placeholder="https://...">
+      </div>
+
+      <h3>Quote e pagamenti</h3>
+
+      <div class="grid">
+        <div class="field">
+          <label>Tipo quota</label>
+          <select id="f-tipo-quota">
+            <option value="">Seleziona</option>
+            <option value="Mensile">Mensile</option>
+            <option value="Trimestrale">Trimestrale</option>
+            <option value="Semestrale">Semestrale</option>
+            <option value="Annuale">Annuale</option>
+            <option value="Altro">Altro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Importo dovuto (€)</label>
+          <input id="f-dovuto" type="number" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label>Importo versato (€)</label>
+          <input id="f-versato" type="number" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label>Stato pagamento</label>
+          <select id="f-stato-pagamento">
+            <option value="">Seleziona</option>
+            <option value="Da pagare">Da pagare</option>
+            <option value="Parziale">Parziale</option>
+            <option value="Pagato">Pagato</option>
+          </select>
+        </div>
+      </div>
+
+      <h3>Note</h3>
+      <div class="field">
+        <textarea id="f-note" placeholder="Inserisci eventuali note..."></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="primary" id="saveBtn">Salva tesserato</button>
+        <button type="button" class="secondary" onclick="closeMember()">Annulla</button>
+      </div>
+
+    </form>
   </div>
+</div>
 
-  <script>
-    const DEFAULT_URL = "https://mmyeypkzwxbjytkzdajc.supabase.co";
-    const DEFAULT_KEY = "sb_publishable_JyBDX3sWT7e6JwpvwuikA_RYFgoRro";
+<div id="toast" class="hidden"></div>
 
-    let soci = [];
-    let currentFilter = 'tutti';
-    let supabaseClient = null;
+<script>
+/* =========================================
+   CONFIGURAZIONE SUPABASE
+========================================= */
 
-    function initSupabase() {
-      const url = localStorage.getItem('supabase_url') || DEFAULT_URL;
-      const key = localStorage.getItem('supabase_key') || DEFAULT_KEY;
-      
-      if (url && key) {
-        supabaseClient = supabase.createClient(url, key, {
-          auth: { persistSession: false }
-        });
-        loadSociFromCloud();
-      } else {
-        soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
-        renderSoci();
+const SUPABASE_URL = "https://mmyeypkzwxbjytkzdajc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JyBDX3sWT7e6Jwpvw-uikA_RYFgoRro";
+
+const TABLE = "tesserati";
+
+const COL = {
+  id: "id",
+  created: "Created_at",
+  nome: "Nome",
+  cognome: "Cognome",
+  email: "Email",
+  telefono: "Telefono",
+  nascita: "Data di nascita",
+  note: "Note",
+  scadenza: "Scadenza certificato",
+  tipoCertificato: "Tipo certificato",
+  fileCertificato: "File_certificato_url",
+  tesserato: "tesserato",
+  tipoQuota: "Tipo_quota",
+  dovuto: "Importo_ dovuto",
+  versato: "Importo_versato",
+  statoPagamento: "Stato pagamento"
+};
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let members = [];
+let editingId = null;
+let realtimeChannel = null;
+let loading = false;
+
+/* =========================================
+   FUNZIONI GENERALI
+========================================= */
+
+function notify(message, type = "") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = type;
+  toast.classList.remove("hidden");
+
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => {
+    toast.classList.add("hidden");
+  }, 4500);
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  const parts = String(value).split("-");
+  if (parts.length !== 3) return value;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function showApp() {
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("appSection").classList.remove("hidden");
+  document.getElementById("logoutBtn").classList.remove("hidden");
+}
+
+function showLogin() {
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("appSection").classList.add("hidden");
+  document.getElementById("logoutBtn").classList.add("hidden");
+}
+
+/* =========================================
+   AUTENTICAZIONE
+========================================= */
+
+document.getElementById("loginForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const button = document.getElementById("loginBtn");
+  button.disabled = true;
+  button.textContent = "Accesso...";
+
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  const { error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  button.disabled = false;
+  button.textContent = "Accedi";
+
+  if (error) {
+    notify("Errore accesso: " + error.message, "error");
+  }
+});
+
+async function logout() {
+  if (realtimeChannel) {
+    await db.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+
+  const { error } = await db.auth.signOut();
+
+  if (error) {
+    notify("Errore uscita: " + error.message, "error");
+    return;
+  }
+
+  members = [];
+  showLogin();
+  notify("Uscita effettuata", "success");
+}
+
+/* =========================================
+   CARICAMENTO DATI DA SUPABASE
+========================================= */
+
+async function loadMembers() {
+  if (loading) return;
+  loading = true;
+
+  document.getElementById("connectionStatus").textContent =
+    "Caricamento dati da Supabase...";
+
+  const { data, error } = await db
+    .from(TABLE)
+    .select("*")
+    .order(COL.created, { ascending: false });
+
+  loading = false;
+
+  if (error) {
+    document.getElementById("connectionStatus").textContent =
+      "Errore di connessione";
+    notify("Errore caricamento: " + error.message, "error");
+    return;
+  }
+
+  members = data || [];
+
+  document.getElementById("connectionStatus").textContent =
+    "Connesso a Supabase • Sincronizzazione attiva";
+
+  renderMembers();
+}
+
+/* =========================================
+   SINCRONIZZAZIONE REALTIME
+========================================= */
+
+function subscribeRealtime() {
+  if (realtimeChannel) {
+    db.removeChannel(realtimeChannel);
+  }
+
+  realtimeChannel = db
+    .channel("schema-db-changes")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: TABLE
+      },
+      () => {
+        loadMembers();
       }
-    }
-
-    async function loadSociFromCloud() {
-      if (!supabaseClient) return;
-      
-      const { data, error } = await supabaseClient
-        .from('tesserati')
-        .select('*');
-
-      if (error) {
-        console.error('Errore Supabase:', error);
-        soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
-      } else if (data) {
-        soci = data.map(item => ({
-          id: item.id,
-          nome: item.nome,
-          tel: item.tel,
-          quota: item.quota,
-          scadenzaCertificati: item.scadenza_certificato || item.scadenzaCertificati,
-          pagamento: item.pagamento
-        }));
-        localStorage.setItem('le_capannine_soci', JSON.stringify(soci));
+    )
+    .subscribe((status) => {
+      if (status === "SUBSCRIBED") {
+        document.getElementById("connectionStatus").textContent =
+          "Connesso • Sincronizzazione in tempo reale attiva";
       }
-      renderSoci();
-    }
+    });
+}
 
-    function renderSoci() {
-      const listEl = document.getElementById('soci-list');
-      const search = document.getElementById('search').value.toLowerCase();
-      listEl.innerHTML = '';
+/* =========================================
+   VISUALIZZAZIONE TESSERATI
+========================================= */
 
-      let filtered = soci.filter(s => (s.nome && s.nome.toLowerCase().includes(search)) || (s.tel && s.tel.includes(search)));
+function renderMembers() {
+  const list = document.getElementById("memberList");
+  const search = document.getElementById("searchInput").value
+    .trim().toLowerCase();
 
-      if(currentFilter === 'scaduti') {
-        const today = new Date().toISOString().split('T')[0];
-        filtered = filtered.filter(s => s.scadenzaCertificati && s.scadenzaCertificati < today);
-      } else if(currentFilter === 'da-pagare') {
-        filtered = filtered.filter(s => s.pagamento === 'Da Pagare');
-      }
+  const filtered = members.filter(member => {
+    const fullName =
+      `${member[COL.nome] || ""} ${member[COL.cognome] || ""}`.toLowerCase();
 
-      document.getElementById('stat-totale').innerText = soci.length;
-      
-      const today = new Date().toISOString().split('T')[0];
-      const critici = soci.filter(s => !s.scadenzaCertificati || s.scadenzaCertificati < today).length;
-      document.getElementById('stat-certificati').innerText = critici;
+    const email = String(member[COL.email] || "").toLowerCase();
+    const telefono = String(member[COL.telefono] || "").toLowerCase();
 
-      const totaleIncassato = soci.filter(s => s.pagamento === 'Regolare').reduce((sum, s) => sum + (parseFloat(s.quota) || 0), 0);
-      const totaleDaIncassare = soci.filter(s => s.pagamento === 'Da Pagare').reduce((sum, s) => sum + (parseFloat(s.quota) || 0), 0);
+    return fullName.includes(search) ||
+      email.includes(search) ||
+      telefono.includes(search);
+  });
 
-      document.getElementById('stat-incassato').innerText = '€ ' + totaleIncassato.toFixed(2);
-      document.getElementById('stat-da-incassare').innerText = '€ ' + totaleDaIncassare.toFixed(2);
+  document.getElementById("memberCount").textContent =
+    `Tesserati visualizzati: ${filtered.length} / ${members.length}`;
 
-      if(filtered.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-secondary);">Nessun socio trovato</div>';
-        return;
-      }
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty">Nessun tesserato trovato.</div>';
+    return;
+  }
 
-      filtered.forEach(s => {
-        const isExpired = !s.scadenzaCertificati || s.scadenzaCertificati < today;
-        const card = document.createElement('div');
-        card.className = 'socio-card';
-        card.innerHTML = `
-          <div class="socio-info">
-            <div class="socio-name">${s.nome}</div>
-            <div class="socio-details">📞 ${s.tel || 'N/D'} | Quota: € ${parseFloat(s.quota || 0).toFixed(2)}</div>
-            <div class="socio-details">📋 Medico: ${s.scadenzaCertificati || 'Mancante'}</div>
+  list.innerHTML = filtered.map(member => {
+    const id = escapeHTML(member[COL.id]);
+    const nome = escapeHTML(member[COL.nome]);
+    const cognome = escapeHTML(member[COL.cognome]);
+    const email = escapeHTML(member[COL.email]);
+    const telefono = escapeHTML(member[COL.telefono]);
+
+    const scadenza = member[COL.scadenza];
+    const dovuto = Number(member[COL.dovuto] || 0);
+    const versato = Number(member[COL.versato] || 0);
+
+    const activeTag = member[COL.tesserato]
+      ? '<span class="tag tag-green">Tesserato</span>'
+      : '<span class="tag tag-red">Non tesserato</span>';
+
+    const paymentTag =
+      member[COL.statoPagamento] === "Pagato"
+        ? '<span class="tag tag-green">Pagato</span>'
+        : '<span class="tag tag-red">' +
+          escapeHTML(member[COL.statoPagamento] || "Da verificare") +
+          '</span>';
+
+    return `
+      <div class="member">
+        <div class="member-top">
+          <div>
+            <strong>${nome} ${cognome}</strong>
+            <div class="member-info">
+              ${email ? email + "<br>" : ""}
+              ${telefono ? telefono : ""}
+            </div>
           </div>
-          <div style="text-align: right;">
-            <div><span class="badge ${s.pagamento === 'Regolare' ? 'badge-ok' : 'badge-danger'}">${s.pagamento}</span></div>
-            <div><span class="badge ${isExpired ? 'badge-danger' : 'badge-ok'}">${isExpired ? 'Cert. Scaduto' : 'Cert. OK'}</span></div>
+          <div class="actions">
+            <button class="secondary" onclick="openMember('${id}')">Modifica</button>
+            <button class="danger" onclick="deleteMember('${id}')">Elimina</button>
           </div>
-        `;
-        listEl.appendChild(card);
-      });
+        </div>
+
+        <div style="margin-top:10px">
+          ${activeTag}
+          ${paymentTag}
+        </div>
+
+        <div class="member-info">
+          Certificato: ${formatDate(scadenza)}<br>
+          Quota dovuta: € ${dovuto.toFixed(2)} |
+          Versato: € ${versato.toFixed(2)}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* =========================================
+   APERTURA E MODIFICA SCHEDA
+========================================= */
+
+function openMember(id = null) {
+  editingId = id;
+  document.getElementById("memberForm").reset();
+
+  document.getElementById("modalTitle").textContent =
+    id ? "Modifica tesserato" : "Nuovo tesserato";
+
+  document.getElementById("saveBtn").textContent =
+    id ? "Salva modifiche" : "Salva tesserato";
+
+  if (id) {
+    const member = members.find(m => String(m[COL.id]) === String(id));
+
+    if (!member) {
+      notify("Tesserato non trovato", "error");
+      return;
     }
 
-    function setFilter(filter, btn) {
-      currentFilter = filter;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderSoci();
+    document.getElementById("f-nome").value = member[COL.nome] || "";
+    document.getElementById("f-cognome").value = member[COL.cognome] || "";
+    document.getElementById("f-email").value = member[COL.email] || "";
+    document.getElementById("f-telefono").value = member[COL.telefono] || "";
+    document.getElementById("f-nascita").value = member[COL.nascita] || "";
+    document.getElementById("f-note").value = member[COL.note] || "";
+
+    document.getElementById("f-scadenza").value = member[COL.scadenza] || "";
+    document.getElementById("f-tipo-certificato").value =
+      member[COL.tipoCertificato] || "";
+    document.getElementById("f-file-certificato").value =
+      member[COL.fileCertificato] || "";
+
+    document.getElementById("f-tesserato").checked =
+      member[COL.tesserato] === true;
+
+    document.getElementById("f-tipo-quota").value =
+      member[COL.tipoQuota] || "";
+
+    document.getElementById("f-dovuto").value =
+      member[COL.dovuto] ?? "";
+
+    document.getElementById("f-versato").value =
+      member[COL.versato] ?? "";
+
+    document.getElementById("f-stato-pagamento").value =
+      member[COL.statoPagamento] || "";
+  } else {
+    document.getElementById("f-tesserato").checked = true;
+  }
+
+  document.getElementById("memberModal").classList.remove("hidden");
+}
+
+function closeMember() {
+  document.getElementById("memberModal").classList.add("hidden");
+  document.getElementById("memberForm").reset();
+  editingId = null;
+}
+
+/* =========================================
+   SALVATAGGIO TESSERATO
+========================================= */
+
+async function saveMember(e) {
+  e.preventDefault();
+
+  const wasEditing = editingId !== null;
+  const idToUpdate = editingId;
+
+  const button = document.getElementById("saveBtn");
+  button.disabled = true;
+  button.textContent = "Salvataggio...";
+
+  const dovutoValue = document.getElementById("f-dovuto").value;
+  const versatoValue = document.getElementById("f-versato").value;
+
+  const payload = {
+    [COL.nome]: document.getElementById("f-nome").value.trim(),
+    [COL.cognome]: document.getElementById("f-cognome").value.trim(),
+    [COL.email]: document.getElementById("f-email").value.trim() || null,
+    [COL.telefono]: document.getElementById("f-telefono").value.trim() || null,
+    [COL.nascita]: document.getElementById("f-nascita").value || null,
+    [COL.note]: document.getElementById("f-note").value.trim() || null,
+    [COL.scadenza]: document.getElementById("f-scadenza").value || null,
+    [COL.tipoCertificato]:
+      document.getElementById("f-tipo-certificato").value || null,
+    [COL.fileCertificato]:
+      document.getElementById("f-file-certificato").value.trim() || null,
+    [COL.tesserato]:
+      document.getElementById("f-tesserato").checked,
+    [COL.tipoQuota]:
+      document.getElementById("f-tipo-quota").value || null,
+    [COL.dovuto]:
+      dovutoValue === "" ? null : Number(dovutoValue),
+    [COL.versato]:
+      versatoValue === "" ? null : Number(versatoValue),
+    [COL.statoPagamento]:
+      document.getElementById("f-stato-pagamento").value || null
+  };
+
+  let result;
+
+  if (wasEditing) {
+    result = await db
+      .from(TABLE)
+      .update(payload)
+      .eq(COL.id, idToUpdate);
+  } else {
+    result = await db
+      .from(TABLE)
+      .insert([payload]);
+  }
+
+  button.disabled = false;
+  button.textContent = wasEditing ? "Salva modifiche" : "Salva tesserato";
+
+  if (result.error) {
+    notify("Errore salvataggio: " + result.error.message, "error");
+    return;
+  }
+
+  closeMember();
+
+  notify(
+    wasEditing ? "Tesserato modificato correttamente" :
+      "Tesserato inserito correttamente",
+    "success"
+  );
+
+  await loadMembers();
+}
+
+/* =========================================
+   ELIMINAZIONE TESSERATO
+========================================= */
+
+async function deleteMember(id) {
+  const member = members.find(m => String(m[COL.id]) === String(id));
+
+  if (!member) return;
+
+  const nome = `${member[COL.nome] || ""} ${member[COL.cognome] || ""}`;
+
+  if (!confirm(`Vuoi eliminare definitivamente ${nome}?`)) {
+    return;
+  }
+
+  const { error } = await db
+    .from(TABLE)
+    .delete()
+    .eq(COL.id, id);
+
+  if (error) {
+    notify("Errore eliminazione: " + error.message, "error");
+    return;
+  }
+
+  notify("Tesserato eliminato", "success");
+  await loadMembers();
+}
+
+/* =========================================
+   AVVIO APPLICAZIONE
+========================================= */
+
+document.getElementById("memberForm")
+  .addEventListener("submit", saveMember);
+
+async function initializeApp() {
+  const { data, error } = await db.auth.getSession();
+
+  if (error) {
+    notify("Errore verifica sessione: " + error.message, "error");
+    return;
+  }
+
+  if (data.session) {
+    showApp();
+    await loadMembers();
+    subscribeRealtime();
+  } else {
+    showLogin();
+  }
+}
+
+db.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_IN" && session) {
+    showApp();
+    loadMembers();
+    subscribeRealtime();
+  }
+
+  if (event === "SIGNED_OUT") {
+    members = [];
+    showLogin();
+
+    if (realtimeChannel) {
+      db.removeChannel(realtimeChannel);
+      realtimeChannel = null;
     }
+  }
+});
 
-    function openConfigModal() { document.getElementById('config-modal').classList.add('active'); }
-    function closeConfigModal() { document.getElementById('config-modal').classList.remove('active'); }
-    function openSocioModal() { document.getElementById('socio-modal').classList.add('active'); }
-    function closeSocioModal() { document.getElementById('socio-modal').classList.remove('active'); }
+initializeApp();
+</script>
 
-    function saveConfig() {
-      const url = document.getElementById('cfg-url').value;
-      const key = document.getElementById('cfg-key').value;
-      localStorage.setItem('supabase_url', url);
-      localStorage.setItem('supabase_key', key);
-      alert('Configurazione salvata!');
-      closeConfigModal();
-      initSupabase();
-    }
-
-    async function saveSocio(e) {
-      e.preventDefault();
-      const saveBtn = document.getElementById('btn-save-socio');
-      saveBtn.innerText = 'Salvataggio...';
-      saveBtn.disabled = true;
-
-      const nuovoSocio = {
-        nome: document.getElementById('socio-nome').value,
-        tel: document.getElementById('socio-tel').value,
-        quota: parseFloat(document.getElementById('socio-quota').value) || 0,
-        scadenzaCertificati: document.getElementById('socio-cert').value,
-        pagamento: document.getElementById('socio-pagamento').value
-      };
-
-      if (supabaseClient) {
-        const { error } = await supabaseClient
-          .from('tesserati')
-          .insert([{
-            nome: nuovoSocio.nome,
-            tel: nuovoSocio.tel,
-            quota: nuovoSocio.quota,
-            scadenza_certificato: nuovoSocio.scadenzaCertificati,
-            pagamento: nuovoSocio.pagamento
-          }]);
-
-        if (error) {
-          alert('Errore Supabase: ' + error.message);
-        } else {
-          await loadSociFromCloud();
-        }
-      } else {
-        nuovoSocio.id = Date.now();
-        soci.push(nuovoSocio);
-        localStorage.setItem('le_capannine_soci', JSON.stringify(soci));
-        renderSoci();
-      }
-
-      saveBtn.innerText = 'Salva Socio';
-      saveBtn.disabled = false;
-      closeSocioModal();
-      document.getElementById('socio-form').reset();
-    }
-
-    document.getElementById('cfg-url').value = localStorage.getItem('supabase_url') || DEFAULT_URL;
-    document.getElementById('cfg-key').value = localStorage.getItem('supabase_key') || DEFAULT_KEY;
-    
-    initSupabase();
-  </script>
 </body>
 </html>
