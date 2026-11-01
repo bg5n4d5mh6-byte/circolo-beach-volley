@@ -158,21 +158,63 @@
             <option value="Da Pagare">In Sospeso / Da Pagare</option>
           </select>
         </div>
-        <button type="submit" class="btn">Salva Socio</button>
+        <button type="submit" class="btn" id="btn-save-socio">Salva Socio</button>
       </form>
     </div>
   </div>
 
   <script>
-    let soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
+    let soci = [];
     let currentFilter = 'tutti';
+    let supabaseClient = null;
+
+    // Inizializza il client Supabase
+    function initSupabase() {
+      const url = localStorage.getItem('supabase_url') || 'https://mmyeypkzwxbjytkzdajc.supabase.co';
+      const key = localStorage.getItem('supabase_key') || '';
+      
+      if (url && key) {
+        supabaseClient = supabase.createClient(url, key);
+        loadSociFromCloud();
+      } else {
+        // Fallback a localStorage se le credenziali non sono ancora configurate
+        soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
+        renderSoci();
+      }
+    }
+
+    // Carica la lista dei soci da Supabase
+    async function loadSociFromCloud() {
+      if (!supabaseClient) return;
+      
+      const { data, error } = await supabaseClient
+        .from('tesserati')
+        .select('*');
+
+      if (error) {
+        console.error('Errore durante il recupero dei dati da Supabase:', error);
+        // Fallback dati locali
+        soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
+      } else if (data) {
+        soci = data.map(item => ({
+          id: item.id,
+          nome: item.nome,
+          tel: item.tel,
+          quota: item.quota,
+          scadenzaCertificati: item.scadenza_certificato || item.scadenzaCertificati,
+          pagamento: item.pagamento
+        }));
+        localStorage.setItem('le_capannine_soci', JSON.stringify(soci));
+      }
+      renderSoci();
+    }
 
     function renderSoci() {
       const listEl = document.getElementById('soci-list');
       const search = document.getElementById('search').value.toLowerCase();
       listEl.innerHTML = '';
 
-      let filtered = soci.filter(s => s.nome.toLowerCase().includes(search) || (s.tel && s.tel.includes(search)));
+      let filtered = soci.filter(s => (s.nome && s.nome.toLowerCase().includes(search)) || (s.tel && s.tel.includes(search)));
 
       if(currentFilter === 'scaduti') {
         const today = new Date().toISOString().split('T')[0];
@@ -237,28 +279,57 @@
       localStorage.setItem('supabase_key', key);
       alert('Configurazione salvata!');
       closeConfigModal();
+      initSupabase();
     }
 
-    function saveSocio(e) {
+    async function saveSocio(e) {
       e.preventDefault();
+      const saveBtn = document.getElementById('btn-save-socio');
+      saveBtn.innerText = 'Salvataggio...';
+      saveBtn.disabled = true;
+
       const nuovoSocio = {
-        id: Date.now(),
         nome: document.getElementById('socio-nome').value,
         tel: document.getElementById('socio-tel').value,
-        quota: document.getElementById('socio-quota').value,
+        quota: parseFloat(document.getElementById('socio-quota').value) || 0,
         scadenzaCertificati: document.getElementById('socio-cert').value,
         pagamento: document.getElementById('socio-pagamento').value
       };
-      soci.push(nuovoSocio);
-      localStorage.setItem('le_capannine_soci', JSON.stringify(soci));
-      renderSoci();
+
+      if (supabaseClient) {
+        const { error } = await supabaseClient
+          .from('tesserati')
+          .insert([{
+            nome: nuovoSocio.nome,
+            tel: nuovoSocio.tel,
+            quota: nuovoSocio.quota,
+            scadenza_certificato: nuovoSocio.scadenzaCertificati,
+            pagamento: nuovoSocio.pagamento
+          }]);
+
+        if (error) {
+          alert('Errore nel salvataggio su Supabase: ' + error.message);
+        } else {
+          await loadSociFromCloud();
+        }
+      } else {
+        nuovoSocio.id = Date.now();
+        soci.push(nuovoSocio);
+        localStorage.setItem('le_capannine_soci', JSON.stringify(soci));
+        renderSoci();
+      }
+
+      saveBtn.innerText = 'Salva Socio';
+      saveBtn.disabled = false;
       closeSocioModal();
       document.getElementById('socio-form').reset();
     }
 
     document.getElementById('cfg-url').value = localStorage.getItem('supabase_url') || 'https://mmyeypkzwxbjytkzdajc.supabase.co';
     document.getElementById('cfg-key').value = localStorage.getItem('supabase_key') || '';
-    renderSoci();
+    
+    // Avvio dell'app
+    initSupabase();
   </script>
 </body>
 </html>
