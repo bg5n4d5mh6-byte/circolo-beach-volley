@@ -114,14 +114,14 @@
         <h3>Configurazione Cloud (Supabase)</h3>
         <button class="btn-icon btn-secondary" onclick="closeConfigModal()">✕</button>
       </div>
-      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Inserisci le credenziali del tuo progetto Supabase per sincronizzare i dati in tempo reale.</p>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Credenziali Supabase collegate per la sincronizzazione multi-dispositivo.</p>
       <div class="form-group">
         <label>Project URL</label>
-        <input type="text" id="cfg-url" class="form-control" placeholder="https://xyz.supabase.co">
+        <input type="text" id="cfg-url" class="form-control">
       </div>
       <div class="form-group">
         <label>Anon Key / Public Key</label>
-        <input type="text" id="cfg-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiI...">
+        <input type="text" id="cfg-key" class="form-control">
       </div>
       <button class="btn" onclick="saveConfig()">Salva e Connetti</button>
     </div>
@@ -164,26 +164,26 @@
   </div>
 
   <script>
+    const DEFAULT_URL = "https://mmyeypkzwxbjytkzdajc.supabase.co";
+    const DEFAULT_KEY = "sb_publishable_JyBDX3sWT7e6JwpvwuikA_RYFgoRro";
+
     let soci = [];
     let currentFilter = 'tutti';
     let supabaseClient = null;
 
-    // Inizializza il client Supabase
     function initSupabase() {
-      const url = localStorage.getItem('supabase_url') || 'https://mmyeypkzwxbjytkzdajc.supabase.co';
-      const key = localStorage.getItem('supabase_key') || '';
+      const url = localStorage.getItem('supabase_url') || DEFAULT_URL;
+      const key = localStorage.getItem('supabase_key') || DEFAULT_KEY;
       
       if (url && key) {
         supabaseClient = supabase.createClient(url, key);
         loadSociFromCloud();
       } else {
-        // Fallback a localStorage se le credenziali non sono ancora configurate
         soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
         renderSoci();
       }
     }
 
-    // Carica la lista dei soci da Supabase
     async function loadSociFromCloud() {
       if (!supabaseClient) return;
       
@@ -192,8 +192,7 @@
         .select('*');
 
       if (error) {
-        console.error('Errore durante il recupero dei dati da Supabase:', error);
-        // Fallback dati locali
+        console.error('Errore Supabase:', error);
         soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
       } else if (data) {
         soci = data.map(item => ({
@@ -223,7 +222,6 @@
         filtered = filtered.filter(s => s.pagamento === 'Da Pagare');
       }
 
-      // Conteggi globali
       document.getElementById('stat-totale').innerText = soci.length;
       
       const today = new Date().toISOString().split('T')[0];
@@ -308,7 +306,7 @@
           }]);
 
         if (error) {
-          alert('Errore nel salvataggio su Supabase: ' + error.message);
+          alert('Errore Supabase: ' + error.message);
         } else {
           await loadSociFromCloud();
         }
@@ -325,10 +323,9 @@
       document.getElementById('socio-form').reset();
     }
 
-    document.getElementById('cfg-url').value = localStorage.getItem('supabase_url') || 'https://mmyeypkzwxbjytkzdajc.supabase.co';
-    document.getElementById('cfg-key').value = localStorage.getItem('supabase_key') || '';
+    document.getElementById('cfg-url').value = localStorage.getItem('supabase_url') || DEFAULT_URL;
+    document.getElementById('cfg-key').value = localStorage.getItem('supabase_key') || DEFAULT_KEY;
     
-    // Avvio dell'app
     initSupabase();
   </script>
 </body>
