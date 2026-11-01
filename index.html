@@ -120,7 +120,7 @@
         <input type="text" id="cfg-url" class="form-control">
       </div>
       <div class="form-group">
-        <label>Anon Key / Public Key</label>
+        <label>Publishable Key</label>
         <input type="text" id="cfg-key" class="form-control">
       </div>
       <button class="btn" onclick="saveConfig()">Salva e Connetti</button>
@@ -176,7 +176,9 @@
       const key = localStorage.getItem('supabase_key') || DEFAULT_KEY;
       
       if (url && key) {
-        supabaseClient = supabase.createClient(url, key);
+        supabaseClient = supabase.createClient(url, key, {
+          auth: { persistSession: false }
+        });
         loadSociFromCloud();
       } else {
         soci = JSON.parse(localStorage.getItem('le_capannine_soci') || '[]');
