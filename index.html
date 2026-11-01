@@ -216,7 +216,19 @@ button:disabled {opacity:.5;cursor:not-allowed}
   </section>
 
   <section id="appSection" class="hidden">
+<div class="grid" style="margin-bottom:20px">
 
+  <div class="card">
+    <p class="small">Totale soci paganti</p>
+    <h2 id="totalSoci">0</h2>
+  </div>
+
+  <div class="card">
+    <p class="small">Totale incassato</p>
+    <h2 id="totaleIncassato">€ 0,00</h2>
+  </div>
+
+</div>
     <div class="card">
       <div class="toolbar">
         <div>
@@ -545,6 +557,25 @@ function subscribeRealtime() {
 
 function renderMembers() {
   const list = document.getElementById("memberList");
+  // CALCOLO RIEPILOGO ECONOMICO
+  const totaleSoci = members.filter(member => {
+    const dovuto = Number(member[COL.dovuto] || 0);
+    const versato = Number(member[COL.versato] || 0);
+
+    return dovuto > 0 && versato >= dovuto;
+  }).length;
+
+  const totaleIncassato = members.reduce((totale, member) => {
+    return totale + Number(member[COL.versato] || 0);
+  }, 0);
+
+  document.getElementById("totalSoci").textContent = totaleSoci;
+
+  document.getElementById("totaleIncassato").textContent =
+    "€ " + totaleIncassato.toLocaleString("it-IT", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   const search = document.getElementById("searchInput").value
     .trim().toLowerCase();
 
